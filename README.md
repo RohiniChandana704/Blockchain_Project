@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🔄 NexReturn: Decentralized Product Return & Escrow Protocol
 
 A blockchain-based digital product return management and automated escrow refund system built on Ethereum and Hardhat.
@@ -131,3 +132,6 @@ Open **[http://localhost:5173](http://localhost:5173)** in your browser.
 ├── hardhat.config.js              # Hardhat configuration (Solidity 0.8.24)
 └── package.json                   # Project dependencies and script commands
 ```
+=======
+# Blockchain_Project
+>>>>>>> 75de3fbd8c29399621f11d10dcc73cc009d1c9f6
