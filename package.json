@@ -1,0 +1,32 @@
+{
+  "name": "blockchain-return-management",
+  "version": "1.0.0",
+  "description": "Blockchain-based Digital Product Return Management System",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "node": "hardhat node",
+    "deploy": "hardhat run scripts/deploy.js --network localhost",
+    "demo": "hardhat run scripts/demo.js --network localhost",
+    "oracle": "node oracle/shipmentOracle.js",
+    "frontend": "node scripts/serve.js"
+  },
+  "keywords": [
+    "blockchain",
+    "ethereum",
+    "solidity",
+    "hardhat",
+    "returns",
+    "supply-chain"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.18",
+    "vite": "^5.4.11"
+  },
+  "dependencies": {
+    "ethers": "^6.13.4"
+  }
+}

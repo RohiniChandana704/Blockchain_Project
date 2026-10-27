@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexReturn | Decentralized Return & Escrow Protocol</title>
+  <meta name="description" content="Blockchain-based Digital Product Return Management & Escrow Protocol with multi-stakeholder lifecycle tracking.">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
+</head>
+<body>
+
+  <!-- Top Application Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo">🔄</div>
+      <div class="brand-text">
+        <h1>NexReturn Protocol</h1>
+        <p>Decentralized Product Return & Escrow</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Network Badge -->
+      <div class="network-badge">
+        <span class="pulse-dot"></span>
+        <span id="network-display">Hardhat Local (31337)</span>
+      </div>
+
+      <!-- Contract Address Pill -->
+      <button class="btn btn-outline" id="btn-copy-contract" title="Copy Contract Address" style="padding: 0.35rem 0.75rem; font-size: 0.78rem;">
+        <span>📍 Contract:</span>
+        <span id="contract-addr-short" style="font-family: 'JetBrains Mono', monospace;">0x5Fb...aa3</span>
+        <span>📋</span>
+      </button>
+
+      <!-- Account / Persona Switcher -->
+      <div class="account-selector-wrapper">
+        <label for="account-selector">Persona:</label>
+        <select id="account-selector" class="account-select">
+          <option value="0">👑 System Admin</option>
+          <option value="1">🏪 TechStore (Seller)</option>
+          <option value="2" selected>🛍️ Alice (Customer 1)</option>
+          <option value="6">🛍️ Bob (Customer 2)</option>
+          <option value="3">🚚 Swift Logistics</option>
+          <option value="4">🔍 QA Inspector</option>
+          <option value="5">🛰️ Tracking Oracle</option>
+        </select>
+      </div>
+
+      <!-- Active Wallet Balance -->
+      <div class="item-card" style="padding: 0.35rem 0.85rem; flex-direction: row; gap: 0.5rem; align-items: center; border-radius: var(--radius-md);">
+        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">BAL:</span>
+        <span id="active-balance" style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; color: var(--accent-emerald);">-- ETH</span>
+      </div>
+
+      <!-- Seed Demo Data -->
+      <button class="btn-seed" id="btn-seed-data" title="Seed 3 sample orders & returns into contract">
+        <span>🌱</span>
+        <span>Seed Demo Data</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+
+    <!-- Top Protocol Metrics -->
+    <section class="metrics-grid">
+      <div class="metric-card glass-panel">
+        <div class="metric-icon" style="color: var(--accent-primary);">📦</div>
+        <div class="metric-data">
+          <h3 id="stat-total-returns">0</h3>
+          <p>Total Returns Raised</p>
+        </div>
+      </div>
+      <div class="metric-card glass-panel cyan">
+        <div class="metric-icon" style="color: var(--accent-cyan);">🔒</div>
+        <div class="metric-data">
+          <h3 id="stat-locked-escrow">0.00 ETH</h3>
+          <p>Escrow Funds Locked</p>
+        </div>
+      </div>
+      <div class="metric-card glass-panel emerald">
+        <div class="metric-icon" style="color: var(--accent-emerald);">💸</div>
+        <div class="metric-data">
+          <h3 id="stat-total-refunded">0.00 ETH</h3>
+          <p>Refunds Paid Out</p>
+        </div>
+      </div>
+      <div class="metric-card glass-panel amber">
+        <div class="metric-icon" style="color: var(--accent-amber);">⚖️</div>
+        <div class="metric-data">
+          <h3 id="stat-disputes-count">0</h3>
+          <p>Dispute Cases</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Role Persona Switcher Tabs -->
+    <nav class="role-navigation glass-panel" aria-label="Portal Navigation">
+      <button class="role-tab-btn active" data-tab="customer-tab">
+        <span>🛍️</span>
+        <span>Customer Portal</span>
+        <span class="role-tag">Buyer</span>
+      </button>
+      <button class="role-tab-btn" data-tab="seller-tab">
+        <span>🏪</span>
+        <span>Seller Hub</span>
+        <span class="role-tag">Merchant</span>
+      </button>
+      <button class="role-tab-btn" data-tab="logistics-tab">
+        <span>🚚</span>
+        <span>Logistics Desk</span>
+        <span class="role-tag">Courier</span>
+      </button>
+      <button class="role-tab-btn" data-tab="oracle-tab">
+        <span>🛰️</span>
+        <span>Tracking Oracle</span>
+        <span class="role-tag">Automated</span>
+      </button>
+      <button class="role-tab-btn" data-tab="inspector-tab">
+        <span>🔍</span>
+        <span>Quality Inspector</span>
+        <span class="role-tag">Auditor</span>
+      </button>
+      <button class="role-tab-btn" data-tab="admin-tab">
+        <span>👑</span>
+        <span>Admin Arbitration</span>
+        <span class="role-tag">Gov</span>
+      </button>
+      <button class="role-tab-btn" data-tab="explorer-tab">
+        <span>📊</span>
+        <span>Return Explorer</span>
+        <span class="role-tag">Auditor</span>
+      </button>
+    </nav>
+
+    <!-- 1. CUSTOMER PORTAL -->
+    <section id="customer-tab" class="role-section active">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>🛍️ Customer Purchases & Returns</h2>
+          <span class="section-badge">Connected as Customer</span>
+        </div>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn btn-outline" id="btn-quick-buy" title="Simulate a new digital product purchase">
+            <span>🛒</span>
+            <span>+ Buy Demo Product</span>
+          </button>
+          <button class="btn btn-primary" id="btn-open-raise-modal">
+            <span>➕</span>
+            <span>Raise New Return</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Returns List -->
+      <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-muted);">Active Return Requests</h3>
+      <div id="customer-returns-list" class="cards-grid" style="margin-bottom: 2.5rem;">
+        <div class="item-card glass-panel" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+          No active returns found for this customer account.
+        </div>
+      </div>
+
+      <!-- Verified Purchases List -->
+      <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-muted);">My Verified Purchases</h3>
+      <div id="customer-purchases-list" class="cards-grid">
+        <div class="item-card glass-panel" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+          Loading purchases...
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. SELLER HUB -->
+    <section id="seller-tab" class="role-section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>🏪 Seller Management Hub</h2>
+          <span class="section-badge">Merchant Tools</span>
+        </div>
+      </div>
+
+      <!-- Register Purchase Form -->
+      <div class="glass-panel" style="padding: 1.75rem; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.25rem; font-size: 1.1rem;">Register New Retail Purchase</h3>
+        <form id="form-register-purchase" class="form-grid">
+          <div class="form-group">
+            <label for="reg-order-id">Order ID (#)</label>
+            <input type="number" id="reg-order-id" class="form-input" placeholder="e.g. 1005" required min="1">
+          </div>
+          <div class="form-group">
+            <label for="reg-customer-addr">Customer Wallet Address</label>
+            <input type="text" id="reg-customer-addr" class="form-input" placeholder="0x..." required>
+          </div>
+          <div class="form-group">
+            <label for="reg-amount-eth">Purchase Amount (ETH)</label>
+            <input type="number" id="reg-amount-eth" class="form-input" placeholder="1.25" step="0.01" required min="0.001">
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary" id="btn-submit-purchase" style="height: 44px;">
+              <span>💾</span>
+              <span>Register Purchase on-chain</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Seller Review & Escrow Approval Queue -->
+      <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-muted);">Incoming Return Claims Awaiting Review / Escrow</h3>
+      <div id="seller-returns-list" class="cards-grid">
+        <div class="item-card glass-panel" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+          No pending returns in review state.
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. LOGISTICS DESK -->
+    <section id="logistics-tab" class="role-section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>🚚 Logistics & Courier Dispatch Desk</h2>
+          <span class="section-badge">Carrier Hub</span>
+        </div>
+      </div>
+
+      <div class="glass-panel" style="padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; background: rgba(168, 85, 247, 0.08); border-color: rgba(168, 85, 247, 0.2);">
+        <p style="font-size: 0.9rem; color: #d8b4fe;">
+          <strong>Logistics Partner Role:</strong> Confirm physical pickup of approved return packages from customer premises. Calling <code>confirmPickup(returnId)</code> transitions the parcel status to <code>PickedUp</code>.
+        </p>
+      </div>
+
+      <div id="logistics-queue-list" class="cards-grid">
+        <div class="item-card glass-panel" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+          No approved returns awaiting pickup.
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. TRACKING ORACLE -->
+    <section id="oracle-tab" class="role-section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>🛰️ Automated Shipment Tracking Oracle</h2>
+          <span class="section-badge">Courier Bridge</span>
+        </div>
+      </div>
+
+      <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 0.5rem; font-size: 1.15rem;">Live Courier Transit Dispatcher</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.25rem;">
+          Simulates real-world courier telematics (FedEx / DHL tracking webhooks) feeding on-chain shipment checkpoints.
+        </p>
+        <div id="oracle-active-shipments" class="cards-grid">
+          <div class="item-card glass-panel" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+            No active shipments requiring transit updates.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. QUALITY INSPECTOR HUB -->
+    <section id="inspector-tab" class="role-section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>🔍 Quality & Authentication Inspection Hub</h2>
+          <span class="section-badge">QA Verification</span>
+        </div>
+      </div>
+
+      <div class="glass-panel" style="padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; background: rgba(14, 165, 233, 0.08); border-color: rgba(14, 165, 233, 0.2);">
+        <p style="font-size: 0.9rem; color: #7dd3fc;">
+          <strong>Inspector Responsibility:</strong> Inspect parcel contents arrived at Hub (<code>Received</code> state). If condition matches defect claim and serial is authentic, mark Condition OK (<code>Accepted</code>). If damaged/counterfeit/tampered, mark Condition Failed (<code>Disputed</code>).
+        </p>
+      </div>
+
+      <div id="inspector-queue-list" class="cards-grid">
+        <div class="item-card glass-panel" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+          No shipments currently at inspection center awaiting QA.
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. ADMIN ARBITRATION COURT -->
+    <section id="admin-tab" class="role-section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>👑 Dispute Arbitration Court & Role Permissions</h2>
+          <span class="section-badge">Governance</span>
+        </div>
+      </div>
+
+      <!-- Disputed Returns Queue -->
+      <h3 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--accent-rose);">Active Disputed Returns Awaiting Arbitration</h3>
+      <div id="admin-disputes-list" class="cards-grid" style="margin-bottom: 2.5rem;">
+        <div class="item-card glass-panel" style="text-align: center; color: var(--text-muted); padding: 2.5rem;">
+          No active disputed returns.
+        </div>
+      </div>
+
+      <!-- Role Management Panel -->
+      <div class="glass-panel" style="padding: 1.75rem;">
+        <h3 style="margin-bottom: 1.25rem; font-size: 1.1rem;">Grant System Role Permissions</h3>
+        <form id="form-add-role" class="form-grid">
+          <div class="form-group">
+            <label for="role-type-select">Role Type</label>
+            <select id="role-type-select" class="form-input">
+              <option value="seller">🏪 Seller</option>
+              <option value="logistics">🚚 Logistics Partner</option>
+              <option value="inspector">🔍 QA Inspector</option>
+              <option value="oracle">🛰️ Tracking Oracle</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="role-target-addr">Ethereum Address</label>
+            <input type="text" id="role-target-addr" class="form-input" placeholder="0x..." required>
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button type="submit" class="btn btn-primary" style="height: 44px;">
+              <span>🛡️</span>
+              <span>Grant Role Permission</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- 7. RETURN EXPLORER & VISUAL STEPPER -->
+    <section id="explorer-tab" class="role-section">
+      <div class="section-header">
+        <div class="section-title">
+          <h2>📊 Full Return Lifecycle Explorer</h2>
+          <span class="section-badge">Audit Trail</span>
+        </div>
+      </div>
+
+      <div class="glass-panel" style="padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <label for="explorer-return-id" style="font-weight: 600; font-size: 0.9rem;">Select Return ID to inspect:</label>
+          <select id="explorer-return-id" class="form-input" style="min-width: 180px;">
+            <option value="1">Return #1</option>
+          </select>
+          <button class="btn btn-primary" id="btn-refresh-explorer">
+            <span>🔄</span>
+            <span>Refresh State</span>
+          </button>
+        </div>
+
+        <!-- Visual 11-Step Progress Bar -->
+        <div class="stepper-container" id="visual-stepper">
+          <div class="stepper-track">
+            <div class="step-node" id="step-node-1"><div class="step-circle">1</div><div class="step-label">Submitted</div></div>
+            <div class="step-node" id="step-node-2"><div class="step-circle">2</div><div class="step-label">Review</div></div>
+            <div class="step-node" id="step-node-3"><div class="step-circle">3</div><div class="step-label">Approved</div></div>
+            <div class="step-node" id="step-node-5"><div class="step-circle">4</div><div class="step-label">Picked Up</div></div>
+            <div class="step-node" id="step-node-6"><div class="step-circle">5</div><div class="step-label">In Transit</div></div>
+            <div class="step-node" id="step-node-7"><div class="step-circle">6</div><div class="step-label">Received</div></div>
+            <div class="step-node" id="step-node-8"><div class="step-circle">7</div><div class="step-label">Inspected</div></div>
+            <div class="step-node" id="step-node-10"><div class="step-circle">8</div><div class="step-label">Accepted</div></div>
+            <div class="step-node" id="step-node-11"><div class="step-circle">9</div><div class="step-label">Refunded</div></div>
+          </div>
+        </div>
+
+        <!-- Detailed Return Record Inspection -->
+        <div id="explorer-details-view" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Chronological Status History -->
+        <h4 style="margin-top: 1.5rem; margin-bottom: 0.75rem; font-size: 0.95rem; color: var(--text-muted);">Audit Trail History:</h4>
+        <div id="explorer-history-list" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <!-- Status pills inserted here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Event Audit Stream Section -->
+    <section class="glass-panel" style="padding: 1.5rem; margin-top: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span class="pulse-dot"></span>
+          <h3 style="font-size: 1.1rem; font-weight: 700;">Live On-chain Event Stream</h3>
+        </div>
+        <button class="btn btn-outline" id="btn-clear-events" style="font-size: 0.75rem; padding: 0.25rem 0.6rem;">Clear</button>
+      </div>
+      <div id="event-feed" class="event-feed">
+        <div class="event-entry">
+          <span>🎧 Listening for real-time contract events...</span>
+          <span style="color: var(--text-dim); font-size: 0.75rem;">Connecting</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RAISE RETURN MODAL -->
+  <div id="modal-raise-return" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h3 style="font-size: 1.25rem; font-weight: 700;">📦 Raise Return Request</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Submit product return claim with on-chain cryptographic proof</p>
+        </div>
+        <button class="btn btn-outline" id="btn-close-modal" style="padding: 0.25rem 0.6rem;">✕</button>
+      </div>
+
+      <form id="form-raise-return" style="display: flex; flex-direction: column; gap: 1.1rem;">
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label for="raise-order-id" style="font-weight: 600;">Selected Order to Return</label>
+            <span id="order-source-badge" class="status-badge approved" style="font-size: 0.72rem; padding: 2px 8px;">Eligible Purchase</span>
+          </div>
+          <select id="raise-order-id" class="form-input" required>
+            <option value="">Loading eligible orders...</option>
+          </select>
+        </div>
+
+        <!-- Selected Order Information Card -->
+        <div id="raise-order-preview-card" class="order-preview-card">
+          <div style="display: flex; gap: 0.75rem; align-items: center;">
+            <div id="preview-product-icon" style="font-size: 1.8rem; background: rgba(99, 102, 241, 0.12); padding: 0.4rem 0.6rem; border-radius: 8px;">💻</div>
+            <div>
+              <div id="preview-product-name" style="font-weight: 700; font-size: 0.92rem; color: #fff;">Apple MacBook Pro 14" (M3 Pro)</div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); margin-top: 2px;">
+                Order <strong id="preview-order-id" style="color: var(--accent-cyan);">#1001</strong> • Merchant: <span id="preview-seller">TechStore Direct</span>
+              </div>
+            </div>
+          </div>
+          <div style="text-align: right; min-width: 80px;">
+            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Refund Value</div>
+            <div id="preview-order-amount" style="font-size: 1.05rem; font-weight: 700; color: var(--accent-emerald);">0.500 ETH</div>
+          </div>
+        </div>
+
+        <!-- Custom Order inputs (revealed when 'custom' is selected) -->
+        <div id="custom-order-fields" style="display: none; padding: 0.85rem; border-radius: var(--radius-md); background: rgba(99, 102, 241, 0.06); border: 1px dashed rgba(99, 102, 241, 0.3);">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.5rem;">
+            <div>
+              <label for="custom-order-num" style="font-size: 0.78rem; color: var(--text-muted);">Custom Order #</label>
+              <input type="number" id="custom-order-num" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.85rem;" placeholder="e.g. 5001" min="1">
+            </div>
+            <div>
+              <label for="custom-order-eth" style="font-size: 0.78rem; color: var(--text-muted);">Purchase Amount (ETH)</label>
+              <input type="number" id="custom-order-eth" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.85rem;" placeholder="0.5" step="0.01" min="0.01">
+            </div>
+          </div>
+          <div>
+            <label for="custom-order-product" style="font-size: 0.78rem; color: var(--text-muted);">Product Name</label>
+            <input type="text" id="custom-order-product" class="form-input" style="padding: 0.4rem 0.6rem; font-size: 0.85rem;" placeholder="e.g. Wireless Mechanical Keyboard">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem;">
+            <label for="raise-reason">Defect Reason & Details</label>
+            <button type="button" id="btn-autofill-reason" class="btn btn-outline" style="font-size: 0.72rem; padding: 2px 8px; height: auto;">
+              ⚡ Suggest Defect Reason
+            </button>
+          </div>
+          <textarea id="raise-reason" class="form-textarea" rows="3" placeholder="Describe issue (e.g. cracked screen, missing components, device does not power on)..." required></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Cryptographic Proof of Return (Photo/Evidence)</label>
+          <div class="upload-dropzone" id="proof-dropzone">
+            <input type="file" id="proof-file-input" accept="image/*,.pdf" style="display: none;">
+            <div style="font-size: 1.8rem; margin-bottom: 0.5rem;">📷</div>
+            <p style="font-size: 0.88rem; font-weight: 600;">Click to upload proof photo or drag & drop</p>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">SHA-256 / Keccak-256 hash is computed live in browser</p>
+          </div>
+
+          <div id="proof-preview-wrapper" class="preview-box" style="display: none;">
+            <img id="proof-preview-img" class="preview-thumb" src="" alt="Proof Preview">
+            <div style="overflow: hidden; flex: 1;">
+              <p style="font-size: 0.8rem; font-weight: 600;" id="proof-filename">proof.jpg</p>
+              <p class="hash-pill" id="proof-hash-display" style="max-width: 100%; margin-top: 0.25rem;">0x000...</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.25rem;">
+          <button type="button" class="btn btn-outline" id="btn-cancel-raise">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-raise">
+            <span>🚀</span>
+            <span>Submit Return On-Chain</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- QUICK BUY PRODUCT MODAL -->
+  <div id="modal-quick-buy" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 620px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <h3 style="font-size: 1.25rem; font-weight: 700;">🛒 Instant Retail Purchases</h3>
+          <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Simulate retail orders purchased with the connected customer account</p>
+        </div>
+        <button class="btn btn-outline" id="btn-close-quick-buy" style="padding: 0.25rem 0.6rem;">✕</button>
+      </div>
+
+      <div id="catalog-grid" class="cards-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem; max-height: 420px; overflow-y: auto; padding-right: 4px;">
+        <!-- Filled dynamically from PRODUCT_CATALOG -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Load Ethers.js: Try local server route first, fallback to CDN -->
+  <script src="/ethers.umd.min.js"></script>
+  <script>
+    if (typeof ethers === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.13.4/ethers.umd.min.js"><\/script>');
+    }
+  </script>
+
+  <!-- Contract Config & Main Logic -->
+  <script src="js/contractConfig.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
